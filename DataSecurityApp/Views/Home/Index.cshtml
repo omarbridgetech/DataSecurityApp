@@ -1,0 +1,11 @@
+﻿<h2>Login</h2>
+<form method="post" asp-action="Login">
+    <input type="text" name="username" placeholder="Username" required class="form-control mb-2" />
+    <input type="password" name="password" placeholder="Password" required class="form-control mb-2" />
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+<a asp-action="ForgotPassword">Forgot Password?</a>
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}

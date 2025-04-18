@@ -1,0 +1,15 @@
+﻿<h2>User Dashboard</h2>
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        Welcome, @Context.Session.GetString("Username")
+    </div>
+    <div class="card-body">
+        <p class="lead">This is a demo user dashboard. You are logged in as a standard user.</p>
+        <ul class="list-group">
+            <li class="list-group-item">✅ View your profile</li>
+            <li class="list-group-item">📩 Submit requests</li>
+            <li class="list-group-item">📊 View request history</li>
+        </ul>
+    </div>
+</div>
+<a class="btn btn-danger mt-3" asp-controller="Home" asp-action="Logout">Logout</a>
