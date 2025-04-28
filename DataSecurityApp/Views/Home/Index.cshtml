@@ -1,16 +1,13 @@
 ﻿<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-
 <h2>Login</h2>
 <form method="post" asp-action="Login">
     <input type="text" name="username" placeholder="Username" required class="form-control mb-2" />
-
     <div class="input-group mb-2">
         <input type="password" id="loginPassword" name="password" placeholder="Password" required class="form-control mb-2" />
         <span class="input-group-text">
             <i class="bi bi-eye-slash" id="toggleLoginPassword" style="cursor: pointer;"></i>
         </span>
     </div>
-
     <button type="submit" class="btn btn-primary">Login</button>
 </form>
 <a asp-action="ForgotPassword">Forgot Password?</a>
@@ -18,7 +15,29 @@
 {
     <div class="alert alert-danger">@ViewBag.Error</div>
 }
+<!-- SQL Injection Examples Card -->
+<div class="card mt-4">
+    <div class="card-header bg-danger text-white">
+        <h5>SQL Injection Examples</h5>
+    </div>
+    <div class="card-body">
+        <h5>Username Field Injections:</h5>
+        <p><strong>Example 1:</strong> Login as admin without password</p>
+        <p><code class="text-danger">admin' --</code> (username field)</p>
 
+        <p><strong>Example 2:</strong> Login as the first user</p>
+        <p><code class="text-danger">anything' OR 1=1 --</code> (username field)</p>
+
+        <h5 class="mt-4">Password Field Injection:</h5>
+        <p><strong>Example 3:</strong> Login with a specific username bypassing password check</p>
+        <p>Username: <code class="text-danger">admin</code> (or any valid username)</p>
+        <p>Password: <code class="text-danger">' OR 1=1--</code></p>
+
+        <div class="alert alert-warning mt-3">
+            <strong>Note:</strong> This login form is intentionally vulnerable to SQL injection for educational purposes.
+        </div>
+    </div>
+</div>
 <script>
     function togglePassword(inputId, toggleId) {
         const input = document.getElementById(inputId);

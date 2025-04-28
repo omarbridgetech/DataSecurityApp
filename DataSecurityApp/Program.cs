@@ -15,8 +15,20 @@ builder.Services.AddSession();
 
 var app = builder.Build();
 
-DbInitializer.Seed(app); // Seed the first admin user
-
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        DbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();

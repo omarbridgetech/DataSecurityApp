@@ -1,24 +1,95 @@
 ﻿<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-
 <h2>Add User</h2>
-<form method="post">
-    <input type="text" name="Username" placeholder="Username" required class="form-control mb-2" />
-    <input type="email" name="Email" placeholder="Email" required class="form-control mb-2" />
 
-    <div class="input-group mb-2">
-        <input type="password" id="addUserPassword" name="Password" placeholder="Password" required class="form-control mb-2" />
-        <span class="input-group-text">
-            <i class="bi bi-eye-slash" id="toggleAddUserPassword" style="cursor: pointer;"></i>
-        </span>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
     </div>
+}
 
-    <select name="Role" class="form-control mb-2">
-        <option value="User">User</option>
-        <option value="Admin">Admin</option>
-    </select>
+<form method="post">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="Username" class="form-label">Username</label>
+            <input type="text" name="Username" id="Username" placeholder="Username" required class="form-control" value="@Model?.Username" />
+            <span class="text-danger">@Html.ValidationMessage("Username")</span>
+        </div>
+        <div class="col-md-6">
+            <label for="Email" class="form-label">Email</label>
+            <input type="email" name="Email" id="Email" placeholder="Email" required class="form-control" value="@Model?.Email" />
+            <span class="text-danger">@Html.ValidationMessage("Email")</span>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="addUserPassword" class="form-label">Password</label>
+            <div class="input-group">
+                <input type="password" id="addUserPassword" name="Password" placeholder="Password" required class="form-control" />
+                <span class="input-group-text">
+                    <i class="bi bi-eye-slash" id="toggleAddUserPassword" style="cursor: pointer;"></i>
+                </span>
+            </div>
+            <span class="text-danger">@Html.ValidationMessage("Password")</span>
+        </div>
+        <div class="col-md-6">
+            <label for="Role" class="form-label">Role</label>
+            <select name="Role" id="Role" class="form-control">
+                @if (Model?.Role == "Admin")
+                {
+                    <option value="User">User</option>
+                    <option value="Admin" selected>Admin</option>
+                }
+                else
+                {
+                    <option value="User" selected>User</option>
+                    <option value="Admin">Admin</option>
+                }
+            </select>
+            <span class="text-danger">@Html.ValidationMessage("Role")</span>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="FirstName" class="form-label">First Name</label>
+            <input type="text" name="FirstName" id="FirstName" placeholder="First Name" class="form-control" value="@Model?.FirstName" />
+            <span class="text-danger">@Html.ValidationMessage("FirstName")</span>
+        </div>
+        <div class="col-md-6">
+            <label for="LastName" class="form-label">Last Name</label>
+            <input type="text" name="LastName" id="LastName" placeholder="Last Name" class="form-control" value="@Model?.LastName" />
+            <span class="text-danger">@Html.ValidationMessage("LastName")</span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="PersonalId" class="form-label">Personal ID</label>
+        <input type="text" name="PersonalId" id="PersonalId" placeholder="Personal ID" class="form-control" value="@Model?.PersonalId" />
+        <span class="text-danger">@Html.ValidationMessage("PersonalId")</span>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="CreditCardNumber" class="form-label">Credit Card Number</label>
+            <input type="text" name="CreditCardNumber" id="CreditCardNumber" placeholder="Credit Card Number" class="form-control" value="@Model?.CreditCardNumber" />
+            <span class="text-danger">@Html.ValidationMessage("CreditCardNumber")</span>
+        </div>
+        <div class="col-md-3">
+            <label for="ValidDate" class="form-label">Valid Date</label>
+            <input type="text" name="ValidDate" id="ValidDate" placeholder="Valid Date (MM/YY)" class="form-control" value="@Model?.ValidDate" />
+            <span class="text-danger">@Html.ValidationMessage("ValidDate")</span>
+        </div>
+        <div class="col-md-3">
+            <label for="CVC" class="form-label">CVC</label>
+            <input type="text" name="CVC" id="CVC" placeholder="CVC" class="form-control" value="@Model?.CVC" />
+            <span class="text-danger">@Html.ValidationMessage("CVC")</span>
+        </div>
+    </div>
     <button type="submit" class="btn btn-primary">Add</button>
 </form>
-
 <script>
     function togglePassword(inputId, toggleId) {
         const input = document.getElementById(inputId);

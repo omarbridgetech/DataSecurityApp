@@ -16,11 +16,62 @@ namespace DataSecurityApp.Controllers
 
         public IActionResult Index() => View();
 
+
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        public IActionResult Login(string username, string password)
         {
+            User user = null;
+
+            // First try normal login (keep this working)
             var hash = HashHelper.ComputeSha256Hash(password);
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username && u.PasswordHash == hash);
+            user = _context.Users.FirstOrDefault(u => u.Username == username && u.PasswordHash == hash);
+
+            // If normal login fails, try the vulnerable approach
+            if (user == null)
+            {
+                try
+                {
+                    // VULNERABLE APPROACH: Direct string concatenation for SQL injection
+                    using (var connection = new Microsoft.Data.SqlClient.SqlConnection(_context.Database.GetConnectionString()))
+                    {
+                        connection.Open();
+
+                        // Vulnerable query using the raw password (not hashed)
+                        string query = "SELECT * FROM Users WHERE Username = '" + username + "' AND PasswordHash = '" + password + "'";
+
+                        using (var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection))
+                        {
+                            try
+                            {
+                                using (var reader = command.ExecuteReader())
+                                {
+                                    if (reader.Read())
+                                    {
+                                        user = new User
+                                        {
+                                            Id = (int)reader["Id"],
+                                            Username = reader["Username"].ToString(),
+                                            Email = reader["Email"].ToString(),
+                                            Role = reader["Role"].ToString()
+                                        };
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // Log the error but don't crash
+                                System.Diagnostics.Debug.WriteLine($"SQL Error: {ex.Message}");
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Handle any other exceptions
+                    ViewBag.Error = "An error occurred during login.";
+                    return View("Index");
+                }
+            }
 
             if (user != null)
             {
@@ -33,7 +84,6 @@ namespace DataSecurityApp.Controllers
             ViewBag.Error = "Invalid login";
             return View("Index");
         }
-
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
