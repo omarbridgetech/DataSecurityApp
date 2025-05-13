@@ -22,25 +22,28 @@ namespace DataSecurityApp.Controllers
         {
             User user = null;
 
-            // First try normal login (keep this working)
+            // First try normal login (secure EF Core approach)
             var hash = HashHelper.ComputeSha256Hash(password);
             user = _context.Users.FirstOrDefault(u => u.Username == username && u.PasswordHash == hash);
 
-            // If normal login fails, try the vulnerable approach
+            // If normal login fails, still use a SECURE approach for the direct SQL
             if (user == null)
             {
                 try
                 {
-                    // VULNERABLE APPROACH: Direct string concatenation for SQL injection
                     using (var connection = new Microsoft.Data.SqlClient.SqlConnection(_context.Database.GetConnectionString()))
                     {
                         connection.Open();
 
-                        // Vulnerable query using the raw password (not hashed)
-                        string query = "SELECT * FROM Users WHERE Username = '" + username + "' AND PasswordHash = '" + password + "'";
+                        // SECURE APPROACH: Use parameterized query
+                        string query = "SELECT * FROM Users WHERE Username = @Username AND PasswordHash = @PasswordHash";
 
                         using (var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection))
                         {
+                            // Add parameters instead of concatenating strings
+                            command.Parameters.AddWithValue("@Username", username);
+                            command.Parameters.AddWithValue("@PasswordHash", password); // Or hash if needed
+
                             try
                             {
                                 using (var reader = command.ExecuteReader())
@@ -59,7 +62,6 @@ namespace DataSecurityApp.Controllers
                             }
                             catch (Exception ex)
                             {
-                                // Log the error but don't crash
                                 System.Diagnostics.Debug.WriteLine($"SQL Error: {ex.Message}");
                             }
                         }
@@ -67,12 +69,12 @@ namespace DataSecurityApp.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Handle any other exceptions
                     ViewBag.Error = "An error occurred during login.";
                     return View("Index");
                 }
             }
 
+            // Rest of your login logic remains the same
             if (user != null)
             {
                 HttpContext.Session.SetString("UserRole", user.Role);
